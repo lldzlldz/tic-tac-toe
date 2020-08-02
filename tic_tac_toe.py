@@ -28,31 +28,35 @@ table = """
 
 def instructions():
     """
-    Gets the players name, symbols to use and tells the user the rules of the game
+    Gets the players symbol, and tells the user the rules of the game
     """
-    name = input("Please key in your name: ")
     while True:
         ans = input("Will you be going first? ")
         if ans.lower() in ["y", "yes"]:
-            game["human"] = {"player_x": "player_1", "name": name}
+            game["human"] = {"player_x": "player_1"}
             game["computer"] = {"player_x": "player_2"}
             break
         elif ans.lower() in ["n", "no"]:
             game["computer"] = {"player_x": "player_1"}
-            game["human"] = {"player_x": "player_2", "name": name}
+            game["human"] = {"player_x": "player_2"}
             break
         else:
             print('Please key in "y", "yes", "n" or "no"!')
             print()
-    # please change the symbol algorithm so that you have to put a symbol and both symbols cant be the same
-    human_symbol = input(f"Please key in the symbol for {game['human']['name']}: ")
-    game["human"]["symbol"] = human_symbol
-    computer_symbol = input("Please key in the symbol for the computer: ")
-    game["computer"]["symbol"] = computer_symbol
+    while True:
+        human_symbol = input("Please key in the symbol for yourself: ")
+        if len(human_symbol) == 1:
+            break
+    game["human"]["symbol"] = human_symbol.upper()
+    while True:
+        computer_symbol = input("Please key in the symbol for the computer: ")
+        if len(computer_symbol) == 1:
+            break
+    game["computer"]["symbol"] = computer_symbol.upper()
     print(
         f"""
-    {game['human']['name']}'s move will be represented with {game['human']['symbol']} while
-    the computer's name will be represented with {game['human']['symbol']}.
+    Your move will be represented with {game['human']['symbol']},
+    while the computer's name will be represented with {game['computer']['symbol']}.
     Key in the number as shown in the figure below to input your move.
     """.replace(
             "    ", ""
@@ -65,18 +69,19 @@ def instructions():
 def check():
     """
     Checks the dictionary to see if the condition to win has been fulfilled
+    Returns 1 if the condition has been fulfilled
     """
     for [i, j, k] in winning_positions:
         if game[i] == game[j] == game[k] != "No":
             if game[i] == game["computer"]["symbol"]:
-                print("Sorry, you have lost")
+                print("Sorry, you have lost.")
             else:
                 print("Congratulations on winning!")
-            exit()
+            return 1
     # can use while loop/if dict does not contain "no" but it is slower
     if game["turn"] == 9:
         print("You have drawed")
-        exit()
+        return 1 
 
 
 def easy_computers_turn(table):
@@ -93,12 +98,11 @@ def easy_computers_turn(table):
     return table
 
 
-
 def hard_computers_turn(table):
     """
-    Makes the computer smarter by making it analyse 1 move ahead of its turn to see if causes it to lose/win
+    A simple AI that thinks 1 move ahead of its turn to see if causes it to lose/win
     """
-    # make a dict such that it only contains the numbers in game
+    # Makes a dict such that it only contains the numbers in game
     # The computer checks if it has a winning move in its next turn
     # It then checks if the human has a winning move in its next turn
     # If both conditions are false, it falls back to using RNG
@@ -106,8 +110,8 @@ def hard_computers_turn(table):
         number: state for (number, state) in game.items() if type(number) == int
     }
     if game["turn"] >= 4:
-        for i in game:
-            if game[i] == "No":
+        for i in temp_dict:
+            if temp_dict[i] == "No":
                 temp_dict[i] = game["computer"]["symbol"]
                 for [a, b, c] in winning_positions:
                     if (
@@ -125,26 +129,25 @@ def hard_computers_turn(table):
     if game["turn"] >= 3:
         for [a, b, c] in winning_positions:
             if game[a] == game[b] == game["human"]["symbol"] and game[c] == "No":
-                i = c
+                j = c
                 break
             elif game[b] == game[c] == game["human"]["symbol"] and game[a] == "No":
-                i = a
+                j = a
                 break
             elif game[a] == game[c] == game["human"]["symbol"] and game[b] == "No":
-                i = b
+                j = b
                 break
             else:
                 continue
         try:
-            table = table.replace(str(i), game["computer"]["symbol"])
-            game[i] = game["computer"]["symbol"]
+            table = table.replace(str(j), game["computer"]["symbol"])
+            game[j] = game["computer"]["symbol"]
             game["turn"] += 1
             return table
         except UnboundLocalError:
             pass
 
     table = easy_computers_turn(table)
-    print("walao eh")
     return table
 
 
@@ -153,12 +156,18 @@ def humans_turn(table):
     Asks the human to key in a number and changes the state of the game as such.
     """
     while True:
-        i = input("your turn: ")
-        int_i = int(i)
+        i = input("Your turn: ")
+        try:
+            int_i = int(i)
+        except ValueError:
+            print("Please enter an integer!")
+            continue
         if int_i in range(1, 10) and game[int_i] == "No":
             break
+        elif int_i in range(1, 10):
+            print(f"Spot {i} has already been taken!\nPlease input a number into an available slot")
         else:
-            print("please input a number from 1-9 and try again!")
+            print("Please input a number from 1-9 and try again!")
 
     table = table.replace(i, game["human"]["symbol"])
     game[int(i)] = game["human"]["symbol"]
@@ -167,29 +176,20 @@ def humans_turn(table):
     return table
 
 
-#Computer's complete turn
-def cc(table):
-    table = hard_computers_turn(table)
-    print(table)
-    print(game)
-    check()
-    return table
-
-#Human's complete turn
-def hh(table):
-    table = humans_turn(table)
-    print(table)
-    print(game)
-    check()
-    return table
-
-#Main function
+# if i is even--> computer's turn
+# if i is odd--> human's turn
 instructions()
-if game["computer"]["player_x"] == "player_1":
-    while True:
-        table = cc(table)
-        table = hh(table)
-else:
-    while True:
-        table = hh(table)
-        table = cc(table)
+i = 0
+if game["human"]["player_x"] == "player_1":
+    i = 1
+while True:
+    if i % 2 == 0:
+        table = hard_computers_turn(table)
+    else:
+        table = humans_turn(table)
+    print(table)
+    print(game)
+    if check() == 1:
+        break
+    i += 1
+

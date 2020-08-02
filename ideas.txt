@@ -1,0 +1,10 @@
+please change the symbol algorithm so that you have to put a symbol and both symbols cant be the same
+
+let the user choose if they want to play with the hard/easy computer
+
+keep track of the game score so that when the game is played again, we can see the score.(might want to make it best out of x rounds)
+
+allow players to compete against each other
+
+make the board larger(for eg 5*5)
+

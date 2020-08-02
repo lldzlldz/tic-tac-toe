@@ -1,0 +1,9 @@
+1)fixed bugs
+    -under the function hard_computers_turn
+        changed game to temp_dict as it iterated over to 'human'(also makes code faster)
+        changed the variable 'i' to 'j' as it conflicted with the earlier variable 'i' in the function
+    -under the humans_turn function 
+        there are different messages that pop out if you input the numbers wrongly
+        the game will not end if you input the string ''
+2)implemented a new main programme which uses less code 
+3)Does not ask the human for their name

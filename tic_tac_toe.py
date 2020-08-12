@@ -63,7 +63,6 @@ def instructions():
         )
     )
     print(table)
-    return
 
 
 def check():
@@ -81,7 +80,7 @@ def check():
     # can use while loop/if dict does not contain "no" but it is slower
     if game["turn"] == 9:
         print("You have drawed")
-        return 1 
+        return 1
 
 
 def easy_computers_turn(table):
@@ -107,7 +106,7 @@ def hard_computers_turn(table):
     # It then checks if the human has a winning move in its next turn
     # If both conditions are false, it falls back to using RNG
     temp_dict = {
-        number: state for (number, state) in game.items() if type(number) == int
+        number: state for (number, state) in game.items() if isinstance(number, int)
     }
     if game["turn"] >= 4:
         for i in temp_dict:
@@ -120,7 +119,8 @@ def hard_computers_turn(table):
                         == temp_dict[c]
                         == game["computer"]["symbol"]
                     ):
-                        table = table.replace(str(i), game["computer"]["symbol"])
+                        table = table.replace(
+                            str(i), game["computer"]["symbol"])
                         game[i] = game["computer"]["symbol"]
                         game["turn"] += 1
                         return table
@@ -165,7 +165,8 @@ def humans_turn(table):
         if int_i in range(1, 10) and game[int_i] == "No":
             break
         elif int_i in range(1, 10):
-            print(f"Spot {i} has already been taken!\nPlease input a number into an available slot")
+            print(
+                f"Spot {i} has already been taken!\nPlease input a number into an available slot")
         else:
             print("Please input a number from 1-9 and try again!")
 
@@ -192,4 +193,3 @@ while True:
     if check() == 1:
         break
     i += 1
-

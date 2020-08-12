@@ -3,7 +3,7 @@ from random import randrange
 game = {number: state for number in range(1, 10) for state in ["No"]}
 # The game's turn is somewhat half a turn behind
 game["turn"] = 0
-winning_positions = [
+WINNING_POSITIONS = [
     [1, 2, 3],
     [4, 5, 6],
     [7, 8, 9],
@@ -24,6 +24,24 @@ table = """
          |        |        
     7    |   8    |    9   
 """
+
+
+def main(table):
+    instructions()
+    i = 0
+    if game["human"]["player_x"] == "player_1":
+        i = 1
+    # if i is even--> computer's turn
+    # if i is odd--> human's turn
+    while True:
+        if i % 2 == 0:
+            table = hard_computers_turn(table)
+        else:
+            table = humans_turn(table)
+        print(table)
+        if check() == 1:
+            break
+        i += 1
 
 
 def instructions():
@@ -63,7 +81,6 @@ def instructions():
         )
     )
     print(table)
-    return
 
 
 def check():
@@ -71,7 +88,7 @@ def check():
     Checks the dictionary to see if the condition to win has been fulfilled
     Returns 1 if the condition has been fulfilled
     """
-    for [i, j, k] in winning_positions:
+    for [i, j, k] in WINNING_POSITIONS:
         if game[i] == game[j] == game[k] != "No":
             if game[i] == game["computer"]["symbol"]:
                 print("Sorry, you have lost.")
@@ -81,7 +98,7 @@ def check():
     # can use while loop/if dict does not contain "no" but it is slower
     if game["turn"] == 9:
         print("You have drawed")
-        return 1 
+        return 1
 
 
 def easy_computers_turn(table):
@@ -113,21 +130,22 @@ def hard_computers_turn(table):
         for i in temp_dict:
             if temp_dict[i] == "No":
                 temp_dict[i] = game["computer"]["symbol"]
-                for [a, b, c] in winning_positions:
+                for [a, b, c] in WINNING_POSITIONS:
                     if (
                         temp_dict[a]
                         == temp_dict[b]
                         == temp_dict[c]
                         == game["computer"]["symbol"]
                     ):
-                        table = table.replace(str(i), game["computer"]["symbol"])
+                        table = table.replace(
+                            str(i), game["computer"]["symbol"])
                         game[i] = game["computer"]["symbol"]
                         game["turn"] += 1
                         return table
                 temp_dict[i] = "No"
         # alternatively can use combinations from itertools
     if game["turn"] >= 3:
-        for [a, b, c] in winning_positions:
+        for [a, b, c] in WINNING_POSITIONS:
             if game[a] == game[b] == game["human"]["symbol"] and game[c] == "No":
                 j = c
                 break
@@ -165,7 +183,8 @@ def humans_turn(table):
         if int_i in range(1, 10) and game[int_i] == "No":
             break
         elif int_i in range(1, 10):
-            print(f"Spot {i} has already been taken!\nPlease input a number into an available slot")
+            print(
+                f"Spot {i} has already been taken!\nPlease input a number into an available slot")
         else:
             print("Please input a number from 1-9 and try again!")
 
@@ -176,20 +195,5 @@ def humans_turn(table):
     return table
 
 
-# if i is even--> computer's turn
-# if i is odd--> human's turn
-instructions()
-i = 0
-if game["human"]["player_x"] == "player_1":
-    i = 1
-while True:
-    if i % 2 == 0:
-        table = hard_computers_turn(table)
-    else:
-        table = humans_turn(table)
-    print(table)
-    print(game)
-    if check() == 1:
-        break
-    i += 1
-
+if __name__ == '__main__':
+    main(table)
